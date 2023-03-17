@@ -15,6 +15,10 @@ Requirements:
 
 Run:
 
+    copy .env-template to .env
+
+    set up your API_KEY
+
     pip install -r requirements.txt
 
     python main.py
