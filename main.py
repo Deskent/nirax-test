@@ -88,9 +88,9 @@ def show_result(data: dict) -> None:
                 )
             ))
         print(
-            f'\nАртикул: {elem["article"]}\n'
-            f'Брэнд: {elem["brand"]["name"]}\n'
-            f'{prices}'
+            f'\nАртикул: {elem["article"]}'
+            f'\nБрэнд: {elem["brand"]["name"]}'
+            f'\n{prices}'
         )
 
 
