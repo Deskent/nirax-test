@@ -37,10 +37,11 @@ class Worker:
         )
         payload: dict = {
             "method": "GET",
-            "url": f"/ordering/get_stock/?{items_query}",
+            "suffix": "/ordering/get_stock",
+            "query": items_query
         }
         if analogs:
-            payload.update(url=f'{payload["url"]}&analogs=1')
+            payload.update(query=f'{payload["query"]}&analogs=1')
         return self._send_request(payload)
 
     def _send_request(self, payload: dict) -> dict | list:
@@ -52,13 +53,12 @@ class Worker:
         :return: answer as JSON
         """
 
-        key: str = f'/?key={self.api_key}'
-        if '?' in payload['url']:
-            key: str = f'&key={self.api_key}'
-        payload['url'] = f"{self.BASE_URL}{payload['url']}{key}"
+        url = f"{self.BASE_URL}{payload['suffix']}/?key={self.api_key}"
+        if query := payload.get('query'):
+            url: str = f"{url}&{query}"
         try:
-            print(f"Send \'{payload['method']}\' request to \'{payload['url']}\'")
-            response = requests.request(**payload)
+            print(f"Send \'{payload['method']}\' request to \'{url}\'")
+            response = requests.request(method=payload['method'], url=url)
             status_code: int = response.status_code
             print(f'Response status code: {status_code}')
             if status_code == 401:
