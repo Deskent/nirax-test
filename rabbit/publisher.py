@@ -6,7 +6,7 @@ from typing import Any
 from rabbit.rabbit_base import RabbitMQBase
 
 
-class Exchange(RabbitMQBase):
+class Publisher(RabbitMQBase):
 
     def send(self, text: str | bytes):
         self.channel.basic_publish(
@@ -29,8 +29,9 @@ def main():
         1,
     ]
     while True:
+        publisher = Publisher()
         to_send = random.choice(data)
-        Exchange().send_object(to_send)
+        publisher.send_object(to_send)
         time.sleep(random.randint(5, 10))
 
 
