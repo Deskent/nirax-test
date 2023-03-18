@@ -17,16 +17,22 @@ class Worker:
     def __init__(self, api_key: str):
         self.api_key: str = api_key
 
-    def get_stock_by_article(self, items: list, analogs: bool = False) -> dict[str, list[dict]]:
+    def get_stock_with_filter_key(
+            self,
+            items: list,
+            filter_key: str = 'resource_article',
+            analogs: bool = False
+    ) -> dict[str, list[dict]]:
         """
         Return goods list by articles as JSON
 
-        :param items: List of items contains article data
-        :param analogs:
+        :param items: The List of the items contains article data
+        :param filter_key: The key to filter by. Default: resource_article
+        :param analogs: If True - add query analogs=1 to querystring
         :return: response from API as JSON
         """
         items_query: str = '&'.join(
-            f'items[{index}][resource_article]={clean_article(elem["resource_article"])}'
+            f'items[{index}][{filter_key}]={clean_article(elem[filter_key])}'
             for index, elem in enumerate(items)
         )
         payload: dict = {
@@ -91,7 +97,7 @@ def show_result(data: dict) -> None:
 def main(items: list[dict]) -> None:
     """Create worker instance. Send results for show"""
     worker = Worker(API_KEY)
-    result: dict = worker.get_stock_by_article(items=items)
+    result: dict = worker.get_stock_with_filter_key(items=items, filter_key='resource_article')
     show_result(result)
 
 
