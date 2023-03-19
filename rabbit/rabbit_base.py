@@ -21,3 +21,4 @@ class RabbitMQBase:
     def _create_channel(self):
         connection = next(self._get_connection())
         return connection.channel()
+
