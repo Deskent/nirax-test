@@ -1,5 +1,6 @@
 import os
 import re
+from typing import TypeAlias
 
 import requests
 from dotenv import load_dotenv
@@ -10,6 +11,9 @@ load_dotenv()
 
 API_KEY: str = os.getenv('API_KEY')
 
+Orders: TypeAlias = dict[str, list[dict]]
+Item: TypeAlias = dict[str, str]
+
 
 class Worker:
     BASE_URL = "https://api.berg.ru/v1.0"
@@ -19,10 +23,10 @@ class Worker:
 
     def get_stock_with_filter_key(
             self,
-            items: list,
+            items: list[Item],
             filter_key: str = 'resource_article',
             analogs: bool = False
-    ) -> dict[str, list[dict]]:
+    ) -> Orders:
         """
         Return goods list by articles as JSON
 
@@ -31,6 +35,7 @@ class Worker:
         :param analogs: If True - add query analogs=1 to querystring
         :return: response from API as JSON
         """
+
         items_query: str = '&'.join(
             f'items[{index}][{filter_key}]={clean_article(elem[filter_key])}'
             for index, elem in enumerate(items)
@@ -74,7 +79,7 @@ def clean_article(article: str) -> str:
     return re.sub(r'[^a-zA-Z0-9]', '', article)
 
 
-def show_result(data: dict) -> None:
+def show_result(data: Orders) -> None:
     """Print result"""
 
     for elem in data['resources']:
@@ -94,15 +99,16 @@ def show_result(data: dict) -> None:
         )
 
 
-def main(items: list[dict]) -> None:
+def main(api_key: str, items: list[Item]) -> None:
     """Create worker instance. Send results for show"""
-    worker = Worker(API_KEY)
-    result: dict = worker.get_stock_with_filter_key(items=items, filter_key='resource_article')
+
+    worker = Worker(api_key)
+    result: Orders = worker.get_stock_with_filter_key(items=items, filter_key='resource_article')
     show_result(result)
 
 
 if __name__ == '__main__':
-    items: list[dict] = [
+    items: list[Item] = [
         {'resource_article': 'GDB1044'},
         {'resource_article': 'GDB1044'},
         {'resource_article': '1111'},
@@ -111,7 +117,7 @@ if __name__ == '__main__':
     try:
         if not API_KEY:
             raise ApiKeyException('API_KEY not found')
-        main(items)
+        main(api_key=API_KEY, items=items)
     except (
             ApiKeyException,
             DataException
